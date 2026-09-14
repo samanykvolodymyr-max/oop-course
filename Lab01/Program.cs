@@ -1,2 +1,13 @@
-﻿System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-Task1.Run(); 
+﻿using System;
+
+Console.Write("Введіть номер завдання: ");
+string choice = Console.ReadLine()!;
+
+if (choice == "1")
+{
+    Task1.Run();
+}
+else if (choice == "2")
+{
+    Task2.Run();
+}
