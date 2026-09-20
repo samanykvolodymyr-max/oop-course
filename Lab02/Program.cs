@@ -12,3 +12,4 @@ else if (choice == "3") Task3.Run();
 else if (choice == "4") Task4.Run();
 else if (choice == "5") Task5.Run();
 else if (choice == "6") Task6.Run();
+else if (choice == "7") Task7.Run();
