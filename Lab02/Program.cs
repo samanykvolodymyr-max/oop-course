@@ -3,4 +3,8 @@ using System.Globalization;
 
 System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-Task1.Run();
+Console.Write("Введіть номер завдання: ");
+string choice = Console.ReadLine()!;
+
+if (choice == "1") Task1.Run();
+else if (choice == "2") Task2.Run();
