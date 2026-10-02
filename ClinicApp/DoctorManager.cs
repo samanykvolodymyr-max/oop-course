@@ -13,6 +13,17 @@ public class DoctorManager
         get { return _count; }
     }
 
+    public Doctor? this[int id]
+    {
+        get { return FindById(id); }
+    }
+
+    public bool TryGetById(int id, out Doctor? doctor)
+    {
+        doctor = FindById(id);
+        return doctor != null;
+    }
+
     public void Add(Doctor doctor)
     {
         if (_count >= MaxDoctors)

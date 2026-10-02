@@ -31,6 +31,7 @@ while (true)
     Console.WriteLine("4. Розклад на сьогодні");
     Console.WriteLine("5. Згенерувати звіт");
     Console.WriteLine("6. Тест GrowablePatientManager");
+    Console.WriteLine("7. Перевірка утиліт та пошуку");
     Console.WriteLine("0. Вийти");
     Console.Write("Виберіть опцію: ");
 
@@ -41,6 +42,7 @@ while (true)
     else if (choice == "4") clinic.DisplaySchedule(DateTime.Now.AddDays(1));
     else if (choice == "5") clinic.GenerateReport();
     else if (choice == "6") TestGrowableManager();
+    else if (choice == "7") TestUtilsAndSearch(clinic);
     else if (choice == "0") break;
 }
 
@@ -196,4 +198,24 @@ void TestGrowableManager()
 
     Patient? notFound = growable.FindById(99);
     Console.WriteLine(notFound != null ? "Знайдено ID 99: " + notFound.FullName : "ID 99 не знайдено");
+}
+
+void TestUtilsAndSearch(Clinic c)
+{
+    Console.WriteLine("\n=== Перевірка утиліт та безпечного пошуку ===");
+
+    Patient? p = c.Patients[1];
+    Console.WriteLine(p != null ? $"Індексатор c.Patients[1]: {p.FullName}" : "Пацієнта не знайдено.");
+
+    if (c.Doctors.TryGetById(1, out Doctor? doc))
+    {
+        Console.WriteLine($"TryGetById c.Doctors.TryGetById(1): {doc!.FullName}");
+    }
+    else
+    {
+        Console.WriteLine("Лікаря не знайдено.");
+    }
+
+    Console.WriteLine($"Форматування імені ClinicUtils.FormatName(\" дмитро \"): '{ClinicUtils.FormatName(" дмитро ")}'");
+    Console.WriteLine($"Перевірка телефону ClinicUtils.IsValidPhone(\"0631112233\"): {ClinicUtils.IsValidPhone("0631112233")}");
 }

@@ -12,6 +12,16 @@ public class PatientManager
     {
         get { return _count; }
     }
+    public Patient? this[int id]
+    {
+        get { return FindById(id); }
+    }
+
+    public bool TryGetById(int id, out Patient? patient)
+    {
+        patient = FindById(id);
+        return patient != null;
+    }
 
     public void Add(Patient patient)
     {
