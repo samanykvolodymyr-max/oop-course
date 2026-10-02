@@ -7,64 +7,39 @@ public class Appointment
     private static int _nextId = 1;
 
     public int Id { get; }
-    public int PatientId { get; }
-    public int DoctorId { get; }
-    public DateTime ScheduledAt { get; }
-    public int DurationMinutes { get; }
+    public int PatientId { get; set; }
+    public int DoctorId { get; set; }
+    public DateTime DateTime { get; set; }
+    public AppointmentStatus Status { get; set; }
+    public string CancelReason { get; set; }
 
-    public string Status { get; private set; }
-    public string Notes { get; private set; }
-
-    public DateTime EndsAt
+    public Appointment(int patientId, int doctorId, DateTime dateTime)
     {
-        get { return ScheduledAt.AddMinutes(DurationMinutes); }
-    }
-
-    public bool IsUpcoming
-    {
-        get { return ScheduledAt > DateTime.Now && Status == "Scheduled"; }
-    }
-
-    public Appointment(int patientId, int doctorId, DateTime scheduledAt, int durationMinutes = 30)
-    {
-        Id = _nextId;
-        _nextId++;
+        Id = _nextId++;
         PatientId = patientId;
         DoctorId = doctorId;
-        ScheduledAt = scheduledAt;
-        DurationMinutes = durationMinutes;
-        Status = "Scheduled";
-        Notes = "";
+        DateTime = dateTime;
+        Status = AppointmentStatus.Scheduled;
+        CancelReason = "";
     }
 
     public bool Cancel(string reason = "")
     {
-        if (Status == "Scheduled")
-        {
-            Status = "Cancelled";
-            Notes = reason;
-            return true;
-        }
-        return false;
+        if (Status != AppointmentStatus.Scheduled) return false;
+        Status = AppointmentStatus.Cancelled;
+        CancelReason = reason;
+        return true;
     }
 
     public bool Complete()
     {
-        if (Status == "Scheduled")
-        {
-            Status = "Completed";
-            return true;
-        }
-        return false;
+        if (Status != AppointmentStatus.Scheduled) return false;
+        Status = AppointmentStatus.Completed;
+        return true;
     }
 
     public override string ToString()
     {
-        string info = $"[{Id}] Пацієнт #{PatientId} -> Лікар #{DoctorId} | {ScheduledAt:dd.MM.yyyy HH:mm}–{EndsAt:HH:mm} | {Status}";
-        if (Notes.Length > 0)
-        {
-            info += $" | {Notes}";
-        }
-        return info;
+        return $"[{Id}] Запис P:{PatientId} до D:{DoctorId} на {DateTime:dd.MM.yyyy HH:mm} | Статус: {Status}";
     }
 }

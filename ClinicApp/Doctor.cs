@@ -14,40 +14,13 @@ public class Doctor
     public string Phone { get; set; }
     public WorkSchedule Schedule { get; set; }
 
-    public string FullName
-    {
-        get { return FirstName + " " + LastName; }
-    }
+    public string FullName => $"{FirstName} {LastName}";
 
-    public int WorkingHoursPerDay
-    {
-        get { return Schedule.TotalHours; }
-    }
-
-    public bool IsAvailableNow
-    {
-        get { return CanAcceptAt(DateTime.Now.Hour); }
-    }
-
-    public Doctor()
-        : this("Невідомий", "Лікар", Speciality.General, "LIC-000", "0000000000", new WorkSchedule(8, 17))
-    {
-    }
-
-    public Doctor(string firstName, string lastName, Speciality speciality)
-        : this(firstName, lastName, speciality, "LIC-000", "0000000000", new WorkSchedule(8, 17))
-    {
-    }
-
-    public Doctor(string firstName, string lastName, Speciality speciality, string licenseNumber, string phone)
-        : this(firstName, lastName, speciality, licenseNumber, phone, new WorkSchedule(8, 17))
-    {
-    }
+    public bool IsAvailableNow => Schedule.IsNow;
 
     public Doctor(string firstName, string lastName, Speciality speciality, string licenseNumber, string phone, WorkSchedule schedule)
     {
-        Id = _nextId;
-        _nextId++;
+        Id = _nextId++;
         FirstName = firstName;
         LastName = lastName;
         Speciality = speciality;
@@ -56,14 +29,23 @@ public class Doctor
         Schedule = schedule;
     }
 
+    public Doctor(string firstName, string lastName, Speciality speciality)
+        : this(firstName, lastName, speciality, "DOC-000", "", new WorkSchedule(8, 17))
+    {
+    }
+
+    public Doctor()
+        : this("Лікар", "Черговий", Speciality.General, "DOC-000", "", new WorkSchedule(8, 17))
+    {
+    }
+
     public bool CanAcceptAt(int hour)
     {
-        return Schedule.IsWorkingAt(hour);
+        return Schedule.Contains(hour);
     }
 
     public override string ToString()
     {
-        string status = IsAvailableNow ? "доступний зараз" : "не в робочий час";
-        return $"[{Id}] {FullName} | {Speciality} | {LicenseNumber} | Тел: {Phone} | {Schedule} ({WorkingHoursPerDay} год) | {status}";
+        return $"[{Id}] Dr. {FullName} | {ClinicFormatter.FormatSpeciality(Speciality)} | Ліцензія: {LicenseNumber} | Графік: {Schedule}";
     }
 }

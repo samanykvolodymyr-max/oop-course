@@ -13,10 +13,7 @@ public class Patient
     public BloodType BloodType { get; set; }
     public string Phone { get; set; }
 
-    public string FullName
-    {
-        get { return FirstName + " " + LastName; }
-    }
+    public string FullName => $"{FirstName} {LastName}";
 
     public int Age
     {
@@ -29,10 +26,7 @@ public class Patient
         }
     }
 
-    public bool IsAdult
-    {
-        get { return Age >= 18; }
-    }
+    public bool IsAdult => Age >= 18;
 
     public Patient(string firstName, string lastName, DateTime birthDate, BloodType bloodType, string phone)
     {
@@ -63,6 +57,6 @@ public class Patient
 
     public override string ToString()
     {
-        return "[" + Id + "] " + FullName + " | " + Age + " років | Група: " + BloodType + " | Тел: " + Phone;
+        return $"[{Id}] {FullName} | {ClinicFormatter.FormatAge(Age)} | Група: {ClinicFormatter.FormatBloodType(BloodType)} | Тел: {ClinicFormatter.FormatPhone(Phone)}";
     }
 }
