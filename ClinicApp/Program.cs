@@ -30,8 +30,9 @@ while (true)
     Console.WriteLine("3. Записи");
     Console.WriteLine("4. Розклад на сьогодні");
     Console.WriteLine("5. Згенерувати звіт");
-    Console.WriteLine("6. Тест GrowablePatientManager");
+    Console.WriteLine("6. Перевірка GrowablePatientManager");
     Console.WriteLine("7. Перевірка утиліт та пошуку");
+    Console.WriteLine("8. Робота з графіками та кортежами");
     Console.WriteLine("0. Вийти");
     Console.Write("Виберіть опцію: ");
 
@@ -43,6 +44,7 @@ while (true)
     else if (choice == "5") clinic.GenerateReport();
     else if (choice == "6") TestGrowableManager();
     else if (choice == "7") TestUtilsAndSearch(clinic);
+    else if (choice == "8") TestTask04(clinic);
     else if (choice == "0") break;
 }
 
@@ -183,7 +185,7 @@ void AppointmentMenu(Clinic c)
 
 void TestGrowableManager()
 {
-    Console.WriteLine("\n=== Тест GrowablePatientManager ===");
+    Console.WriteLine("\n=== Перевірка GrowablePatientManager ===");
     GrowablePatientManager growable = new GrowablePatientManager();
     Console.WriteLine("Додаємо 20 пацієнтів підряд...");
 
@@ -216,6 +218,29 @@ void TestUtilsAndSearch(Clinic c)
         Console.WriteLine("Лікаря не знайдено.");
     }
 
-    Console.WriteLine($"Форматування імені ClinicUtils.FormatName(\" дмитро \"): '{ClinicUtils.FormatName(" дмитро ")}'");
-    Console.WriteLine($"Перевірка телефону ClinicUtils.IsValidPhone(\"0631112233\"): {ClinicUtils.IsValidPhone("0631112233")}");
+    Console.WriteLine($"Форматування імені: '{ClinicUtils.FormatName(" дмитро ")}'");
+    Console.WriteLine($"Перевірка телефону: {ClinicUtils.IsValidPhone("0631112233")}");
+}
+
+void TestTask04(Clinic c)
+{
+    Console.WriteLine("\n=== Робота з графіками та кортежами ===");
+
+    WorkSchedule standard = new WorkSchedule(9, 17);
+    WorkSchedule extended = standard + 2; 
+    Console.WriteLine($"Початковий графік: {standard}");
+    Console.WriteLine($"Продовжений графік (оператор +): {extended}");
+
+    WorkSchedule anotherSchedule = new WorkSchedule(9, 17);
+    Console.WriteLine($"Графіки однакові (оператор ==): {standard == anotherSchedule}");
+
+    Patient? patient = c.Patients[1];
+    if (patient != null)
+    {
+        var (name, age, blood) = patient;
+        Console.WriteLine($"Деструктуризація пацієнта: {name}, вік: {age}, група крові: {blood}");
+    }
+
+    var (total, adults, avgAge) = c.Patients.GetSummaryTuple();
+    Console.WriteLine($"Кортеж зі статистикою: Всього={total}, Дорослих={adults}, Середній вік={avgAge:F1}");
 }

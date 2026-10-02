@@ -54,6 +54,13 @@ public class Patient
     {
     }
 
+    public void Deconstruct(out string fullName, out int age, out BloodType bloodType)
+    {
+        fullName = FullName;
+        age = Age;
+        bloodType = BloodType;
+    }
+
     public override string ToString()
     {
         return "[" + Id + "] " + FullName + " | " + Age + " років | Група: " + BloodType + " | Тел: " + Phone;

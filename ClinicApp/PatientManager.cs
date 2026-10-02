@@ -12,6 +12,7 @@ public class PatientManager
     {
         get { return _count; }
     }
+
     public Patient? this[int id]
     {
         get { return FindById(id); }
@@ -21,6 +22,22 @@ public class PatientManager
     {
         patient = FindById(id);
         return patient != null;
+    }
+
+    public (int Total, int Adults, double AvgAge) GetSummaryTuple()
+    {
+        if (_count == 0) return (0, 0, 0.0);
+
+        double sumAge = 0;
+        int adultCount = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            sumAge += _patients[i].Age;
+            if (_patients[i].IsAdult) adultCount++;
+        }
+
+        return (_count, adultCount, sumAge / _count);
     }
 
     public void Add(Patient patient)
