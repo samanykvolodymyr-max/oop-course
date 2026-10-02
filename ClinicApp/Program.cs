@@ -3,16 +3,16 @@ using ClinicApp;
 
 Clinic clinic = new Clinic("Медична Клініка");
 
-clinic.Patients.Add(new Patient("Дмитро", "Коваленко", new DateTime(1995, 8, 24), "AB+", "0631112233"));
-clinic.Patients.Add(new Patient("Анна", "Шевченко", new DateTime(2015, 1, 5), "A-", "0974445566"));
+clinic.Patients.Add(new Patient("Дмитро", "Коваленко", new DateTime(1995, 8, 24), BloodType.ABPositive, "0631112233"));
+clinic.Patients.Add(new Patient("Анна", "Шевченко", new DateTime(2015, 1, 5), BloodType.ANegative, "0974445566"));
 clinic.Patients.Add(new Patient("Сергій", "Григоренко"));
 clinic.Patients.Add(new Patient());
-clinic.Patients.Add(new Patient("Вікторія", "Ткачук", new DateTime(1980, 12, 10), "O+", "0502223344"));
+clinic.Patients.Add(new Patient("Вікторія", "Ткачук", new DateTime(1980, 12, 10), BloodType.OPositive, "0502223344"));
 
-Doctor d1 = new Doctor("Василь", "Мельник", "Травматолог", "DOC-777", "0509998877") { WorkStartHour = 10, WorkEndHour = 19 };
-Doctor d2 = new Doctor("Ірина", "Лисенко", "Дерматолог") { WorkStartHour = 8, WorkEndHour = 14 };
+Doctor d1 = new Doctor("Василь", "Мельник", Speciality.Orthopedics, "DOC-777", "0509998877") { WorkStartHour = 10, WorkEndHour = 19 };
+Doctor d2 = new Doctor("Ірина", "Лисенко", Speciality.Dermatology) { WorkStartHour = 8, WorkEndHour = 14 };
 Doctor d3 = new Doctor();
-Doctor d4 = new Doctor("Олексій", "Бойко", "Хірург", "DOC-101", "0670001122") { WorkStartHour = 9, WorkEndHour = 18 };
+Doctor d4 = new Doctor("Олексій", "Бойко", Speciality.Surgery, "DOC-101", "0670001122") { WorkStartHour = 9, WorkEndHour = 18 };
 
 clinic.Doctors.Add(d1);
 clinic.Doctors.Add(d2);
@@ -43,7 +43,6 @@ while (true)
     else if (choice == "6") TestGrowableManager();
     else if (choice == "0") break;
 }
-
 
 void PatientMenu(Clinic c)
 {
@@ -109,9 +108,7 @@ void DoctorMenu(Clinic c)
             string fName = Console.ReadLine()!;
             Console.Write("Прізвище: ");
             string lName = Console.ReadLine()!;
-            Console.Write("Спеціальність: ");
-            string spec = Console.ReadLine()!;
-            c.Doctors.Add(new Doctor(fName, lName, spec));
+            c.Doctors.Add(new Doctor(fName, lName, Speciality.General));
         }
         else if (choice == "3")
         {

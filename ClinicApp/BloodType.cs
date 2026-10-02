@@ -1,10 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace ClinicApp;
 
-namespace ClinicApp
+public enum BloodType
 {
-    internal class BloodType
-    {
-    }
+    Unknown,
+    APositive,
+    ANegative,
+    BPositive,
+    BNegative,
+    ABPositive,
+    ABNegative,
+    OPositive,
+    ONegative
 }

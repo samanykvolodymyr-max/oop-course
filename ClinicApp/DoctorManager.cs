@@ -42,7 +42,7 @@ public class DoctorManager
         int matchCount = 0;
         for (int i = 0; i < _count; i++)
         {
-            if (_doctors[i].Speciality.ToLower().Contains(search))
+            if (_doctors[i].Speciality.ToString().ToLower().Contains(search))
             {
                 matchCount++;
             }
@@ -52,7 +52,7 @@ public class DoctorManager
         int index = 0;
         for (int i = 0; i < _count; i++)
         {
-            if (_doctors[i].Speciality.ToLower().Contains(search))
+            if (_doctors[i].Speciality.ToString().ToLower().Contains(search))
             {
                 result[index] = _doctors[i];
                 index++;

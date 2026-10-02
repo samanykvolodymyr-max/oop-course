@@ -9,10 +9,9 @@ public class Patient
     public int Id { get; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public DateTime DateOfBirth { get; set; }
-    public string BloodType { get; set; }
+    public DateTime BirthDate { get; set; }
+    public BloodType BloodType { get; set; }
     public string Phone { get; set; }
-    public string Email { get; set; }
 
     public string FullName
     {
@@ -23,11 +22,9 @@ public class Patient
     {
         get
         {
-            int age = DateTime.Today.Year - DateOfBirth.Year;
-            if (DateOfBirth.Date > DateTime.Today.AddYears(-age))
-            {
-                age--;
-            }
+            DateTime today = DateTime.Today;
+            int age = today.Year - BirthDate.Year;
+            if (BirthDate.Date > today.AddYears(-age)) age--;
             return age;
         }
     }
@@ -37,43 +34,28 @@ public class Patient
         get { return Age >= 18; }
     }
 
-    public Patient()
-        : this("Невідомий", "Пацієнт", new DateTime(1998, 1, 1), "Невідомо", "0000000000")
+    public Patient(string firstName, string lastName, DateTime birthDate, BloodType bloodType, string phone)
     {
+        Id = _nextId++;
+        FirstName = firstName;
+        LastName = lastName;
+        BirthDate = birthDate;
+        BloodType = bloodType;
+        Phone = phone;
     }
 
     public Patient(string firstName, string lastName)
-        : this(firstName, lastName, new DateTime(1998, 1, 1), "Невідомо", "0000000000")
+        : this(firstName, lastName, DateTime.Today, BloodType.Unknown, "")
     {
     }
 
-    public Patient(string firstName, string lastName, DateTime dob, string bloodType, string phone)
+    public Patient()
+        : this("Анонім", "Анонімов", DateTime.Today, BloodType.Unknown, "")
     {
-        Id = _nextId;
-        _nextId++;
-        FirstName = firstName;
-        LastName = lastName;
-        DateOfBirth = dob;
-        BloodType = bloodType;
-        Phone = phone;
-        Email = "";
-    }
-
-    public string GetAgeCategory()
-    {
-        if (Age < 18)
-        {
-            return "дитина";
-        }
-        if (Age < 60)
-        {
-            return "дорослий";
-        }
-        return "літній";
     }
 
     public override string ToString()
     {
-        return $"[{Id}] {FullName} | Вік: {Age} ({GetAgeCategory()}) | Кров: {BloodType} | Тел: {Phone}";
+        return "[" + Id + "] " + FullName + " | " + Age + " років | Група: " + BloodType + " | Тел: " + Phone;
     }
 }
