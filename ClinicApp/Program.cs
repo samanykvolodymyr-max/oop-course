@@ -10,6 +10,7 @@ clinic.Patients.Add(new Patient());
 clinic.Patients.Add(new Patient("Вікторія", "Ткачук", new DateTime(1980, 12, 10), BloodType.OPositive, "0502223344"));
 
 Doctor d1 = new Doctor("Василь", "Мельник", Speciality.Orthopedics, "DOC-777", "0509998877", new WorkSchedule(10, 19));
+d1.Schedule = new WorkSchedule(8, 16);
 Doctor d2 = new Doctor("Ірина", "Лисенко", Speciality.Dermatology) { Schedule = new WorkSchedule(8, 14) };
 Doctor d3 = new Doctor();
 Doctor d4 = new Doctor("Олексій", "Бойко", Speciality.Surgery, "DOC-101", "0670001122", new WorkSchedule(9, 18));
@@ -21,6 +22,31 @@ clinic.Doctors.Add(d4);
 
 clinic.Appointments.Book(1, 1, DateTime.Now.AddDays(1).AddHours(2));
 clinic.Appointments.Book(2, 2, DateTime.Now.AddDays(1).AddHours(3));
+
+Appointment testApp = clinic.Appointments[0];
+bool isScheduled = testApp.Status == AppointmentStatus.Scheduled;
+
+WorkSchedule morning = new WorkSchedule(8, 12);
+WorkSchedule copy = morning;
+copy = new WorkSchedule(9, 13);
+
+string ageText = ClinicFormatter.FormatAge(21);
+string bloodText = ClinicFormatter.FormatBloodType(BloodType.APositive);
+Patient pIndex0 = clinic.Patients[0];
+Doctor dIndex1 = clinic.Doctors[1];
+
+if (clinic.Patients.TryFindById(1, out Patient? foundPatient))
+{
+    Console.WriteLine($"Знайдено пацієнта: {foundPatient.FullName}");
+}
+
+string? nullName = clinic.Patients.FindById(99)?.FullName;
+string safeName = clinic.Patients.FindById(99)?.FullName ?? "не знайдено";
+
+Doctor[] cardiologyDocs = clinic.Doctors.FindBySpeciality(Speciality.Cardiology);
+Doctor[] stringCardioDocs = clinic.Doctors.FindBySpeciality("кардіо");
+Appointment[] dateApps = clinic.Appointments.GetByDate(2026, 5, 10);
+Patient[] bloodPatients = clinic.Patients.FindByBloodType(BloodType.OPositive);
 
 while (true)
 {
@@ -44,7 +70,7 @@ while (true)
     else if (choice == "5") clinic.GenerateReport();
     else if (choice == "6") TestGrowableManager();
     else if (choice == "7") TestUtilsAndSearch(clinic);
-    else if (choice == "8") TestTask04(clinic);
+    else if (choice == "8") TestScheduleAndTuples(clinic);
     else if (choice == "0") break;
 }
 
@@ -206,12 +232,12 @@ void TestUtilsAndSearch(Clinic c)
 {
     Console.WriteLine("\n=== Перевірка утиліт та безпечного пошуку ===");
 
-    Patient? p = c.Patients[1];
-    Console.WriteLine(p != null ? $"Індексатор c.Patients[1]: {p.FullName}" : "Пацієнта не знайдено.");
+    Patient? p = c.Patients[0];
+    Console.WriteLine(p != null ? $"Індексатор c.Patients[0]: {p.FullName}" : "Пацієнта не знайдено.");
 
-    if (c.Doctors.TryGetById(1, out Doctor? doc))
+    if (c.Doctors.TryFindById(1, out Doctor? doc))
     {
-        Console.WriteLine($"TryGetById c.Doctors.TryGetById(1): {doc!.FullName}");
+        Console.WriteLine($"TryFindById c.Doctors.TryFindById(1): {doc!.FullName}");
     }
     else
     {
@@ -222,19 +248,14 @@ void TestUtilsAndSearch(Clinic c)
     Console.WriteLine($"Перевірка телефону: {ClinicUtils.IsValidPhone("0631112233")}");
 }
 
-void TestTask04(Clinic c)
+void TestScheduleAndTuples(Clinic c)
 {
     Console.WriteLine("\n=== Робота з графіками та кортежами ===");
 
     WorkSchedule standard = new WorkSchedule(9, 17);
-    WorkSchedule extended = standard + 2; 
     Console.WriteLine($"Початковий графік: {standard}");
-    Console.WriteLine($"Продовжений графік (оператор +): {extended}");
 
-    WorkSchedule anotherSchedule = new WorkSchedule(9, 17);
-    Console.WriteLine($"Графіки однакові (оператор ==): {standard == anotherSchedule}");
-
-    Patient? patient = c.Patients[1];
+    Patient? patient = c.Patients[0];
     if (patient != null)
     {
         var (name, age, blood) = patient;
