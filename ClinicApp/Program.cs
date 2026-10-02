@@ -9,10 +9,10 @@ clinic.Patients.Add(new Patient("Сергій", "Григоренко"));
 clinic.Patients.Add(new Patient());
 clinic.Patients.Add(new Patient("Вікторія", "Ткачук", new DateTime(1980, 12, 10), BloodType.OPositive, "0502223344"));
 
-Doctor d1 = new Doctor("Василь", "Мельник", Speciality.Orthopedics, "DOC-777", "0509998877") { WorkStartHour = 10, WorkEndHour = 19 };
-Doctor d2 = new Doctor("Ірина", "Лисенко", Speciality.Dermatology) { WorkStartHour = 8, WorkEndHour = 14 };
+Doctor d1 = new Doctor("Василь", "Мельник", Speciality.Orthopedics, "DOC-777", "0509998877", new WorkSchedule(10, 19));
+Doctor d2 = new Doctor("Ірина", "Лисенко", Speciality.Dermatology) { Schedule = new WorkSchedule(8, 14) };
 Doctor d3 = new Doctor();
-Doctor d4 = new Doctor("Олексій", "Бойко", Speciality.Surgery, "DOC-101", "0670001122") { WorkStartHour = 9, WorkEndHour = 18 };
+Doctor d4 = new Doctor("Олексій", "Бойко", Speciality.Surgery, "DOC-101", "0670001122", new WorkSchedule(9, 18));
 
 clinic.Doctors.Add(d1);
 clinic.Doctors.Add(d2);

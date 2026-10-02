@@ -12,8 +12,7 @@ public class Doctor
     public Speciality Speciality { get; set; }
     public string LicenseNumber { get; set; }
     public string Phone { get; set; }
-    public int WorkStartHour { get; set; }
-    public int WorkEndHour { get; set; }
+    public WorkSchedule Schedule { get; set; }
 
     public string FullName
     {
@@ -22,12 +21,7 @@ public class Doctor
 
     public int WorkingHoursPerDay
     {
-        get { return WorkEndHour - WorkStartHour; }
-    }
-
-    public string WorkSchedule
-    {
-        get { return $"{WorkStartHour:D2}:00–{WorkEndHour:D2}:00"; }
+        get { return Schedule.TotalHours; }
     }
 
     public bool IsAvailableNow
@@ -36,16 +30,21 @@ public class Doctor
     }
 
     public Doctor()
-        : this("Невідомий", "Лікар", Speciality.General, "LIC-000", "0000000000")
+        : this("Невідомий", "Лікар", Speciality.General, "LIC-000", "0000000000", new WorkSchedule(8, 17))
     {
     }
 
     public Doctor(string firstName, string lastName, Speciality speciality)
-        : this(firstName, lastName, speciality, "LIC-000", "0000000000")
+        : this(firstName, lastName, speciality, "LIC-000", "0000000000", new WorkSchedule(8, 17))
     {
     }
 
     public Doctor(string firstName, string lastName, Speciality speciality, string licenseNumber, string phone)
+        : this(firstName, lastName, speciality, licenseNumber, phone, new WorkSchedule(8, 17))
+    {
+    }
+
+    public Doctor(string firstName, string lastName, Speciality speciality, string licenseNumber, string phone, WorkSchedule schedule)
     {
         Id = _nextId;
         _nextId++;
@@ -54,27 +53,17 @@ public class Doctor
         Speciality = speciality;
         LicenseNumber = licenseNumber;
         Phone = phone;
-        WorkStartHour = 8;
-        WorkEndHour = 17;
+        Schedule = schedule;
     }
 
     public bool CanAcceptAt(int hour)
     {
-        if (hour >= WorkStartHour && hour < WorkEndHour)
-        {
-            return true;
-        }
-        return false;
+        return Schedule.IsWorkingAt(hour);
     }
 
     public override string ToString()
     {
-        string status = "не в робочий час";
-        if (IsAvailableNow)
-        {
-            status = "доступний зараз";
-        }
-
-        return $"[{Id}] {FullName} | {Speciality} | {LicenseNumber} | Тел: {Phone} | {WorkSchedule} ({WorkingHoursPerDay} год) | {status}";
+        string status = IsAvailableNow ? "доступний зараз" : "не в робочий час";
+        return $"[{Id}] {FullName} | {Speciality} | {LicenseNumber} | Тел: {Phone} | {Schedule} ({WorkingHoursPerDay} год) | {status}";
     }
 }
