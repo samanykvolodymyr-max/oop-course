@@ -8,19 +8,30 @@ public class PatientManager
     private Patient[] _patients = new Patient[MaxPatients];
     private int _count = 0;
 
-    public int Count
+    public int Count => _count;
+
+    public Patient this[int index]
     {
-        get { return _count; }
+        get
+        {
+            if (index < 0 || index >= _count) return null!;
+            return _patients[index];
+        }
     }
 
-    public Patient? this[int id]
+    public Patient[] GetAll()
     {
-        get { return FindById(id); }
+        Patient[] result = new Patient[_count];
+        for (int i = 0; i < _count; i++)
+        {
+            result[i] = _patients[i];
+        }
+        return result;
     }
 
-    public bool TryGetById(int id, out Patient? patient)
+    public bool TryFindById(int id, out Patient patient)
     {
-        patient = FindById(id);
+        patient = FindById(id)!;
         return patient != null;
     }
 
@@ -87,8 +98,27 @@ public class PatientManager
             if (_patients[i].FirstName.ToLower().Contains(search) ||
                 _patients[i].LastName.ToLower().Contains(search))
             {
-                result[index] = _patients[i];
-                index++;
+                result[index++] = _patients[i];
+            }
+        }
+        return result;
+    }
+
+    public Patient[] FindByBloodType(BloodType bloodType)
+    {
+        int matchCount = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_patients[i].BloodType == bloodType) matchCount++;
+        }
+
+        Patient[] result = new Patient[matchCount];
+        int index = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_patients[i].BloodType == bloodType)
+            {
+                result[index++] = _patients[i];
             }
         }
         return result;
@@ -106,10 +136,7 @@ public class PatientManager
             }
         }
 
-        if (indexToRemove == -1)
-        {
-            return false;
-        }
+        if (indexToRemove == -1) return false;
 
         for (int i = indexToRemove; i < _count - 1; i++)
         {
@@ -157,19 +184,10 @@ public class PatientManager
             int currentAge = _patients[i].Age;
             sumAge += currentAge;
 
-            if (_patients[i].IsAdult)
-            {
-                adultCount++;
-            }
+            if (_patients[i].IsAdult) adultCount++;
 
-            if (currentAge < _patients[minAgeIndex].Age)
-            {
-                minAgeIndex = i;
-            }
-            if (currentAge > _patients[maxAgeIndex].Age)
-            {
-                maxAgeIndex = i;
-            }
+            if (currentAge < _patients[minAgeIndex].Age) minAgeIndex = i;
+            if (currentAge > _patients[maxAgeIndex].Age) maxAgeIndex = i;
         }
 
         double avgAge = sumAge / _count;
