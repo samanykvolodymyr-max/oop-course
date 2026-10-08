@@ -7,12 +7,20 @@ public class Appointment
 {
     private static int _nextId = 1;
 
+    private int _durationMinutes = 30;
+
     public int Id { get; }
     public int PatientId { get; set; }
     public int DoctorId { get; set; }
     public DateTime DateTime { get; set; }
     public AppointmentStatus Status { get; set; }
     public string CancelReason { get; set; }
+
+    public int DurationMinutes
+    {
+        get => _durationMinutes;
+        set => _durationMinutes = value;
+    }
 
     public Appointment(int patientId, int doctorId, DateTime dateTime)
     {
@@ -41,6 +49,6 @@ public class Appointment
 
     public override string ToString()
     {
-        return $"[{Id}] Запис P:{PatientId} до D:{DoctorId} на {DateTime:dd.MM.yyyy HH:mm} | Статус: {Status}";
+        return $"[{Id}] Запис P:{PatientId} до D:{DoctorId} на {DateTime:dd.MM.yyyy HH:mm} | Тривалість: {DurationMinutes} хв | Статус: {Status}";
     }
 }
