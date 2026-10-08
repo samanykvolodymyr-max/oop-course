@@ -1,5 +1,9 @@
 ﻿using System;
 using ClinicApp;
+using ClinicApp.Enums;
+using ClinicApp.Managers;
+using ClinicApp.Models;
+using ClinicApp.Utils;
 
 Clinic clinic = new Clinic("Медична Клініка");
 
@@ -243,9 +247,6 @@ void TestUtilsAndSearch(Clinic c)
     {
         Console.WriteLine("Лікаря не знайдено.");
     }
-
-    Console.WriteLine($"Форматування імені: '{ClinicUtils.FormatName(" дмитро ")}'");
-    Console.WriteLine($"Перевірка телефону: {ClinicUtils.IsValidPhone("0631112233")}");
 }
 
 void TestScheduleAndTuples(Clinic c)

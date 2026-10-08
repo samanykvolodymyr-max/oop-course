@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ClinicApp;
+namespace ClinicApp.Utils;
 
 public static class ClinicUtils
 {

@@ -1,6 +1,7 @@
-﻿using System;
+﻿using ClinicApp.Models;
+using System;
 
-namespace ClinicApp;
+namespace ClinicApp.Managers;
 
 public class GrowablePatientManager
 {
