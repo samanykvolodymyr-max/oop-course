@@ -95,11 +95,22 @@ void PatientMenu(Clinic c)
         if (choice == "1") c.Patients.DisplayAll();
         else if (choice == "2")
         {
-            Console.Write("Ім'я: ");
-            string fName = Console.ReadLine()!;
-            Console.Write("Прізвище: ");
-            string lName = Console.ReadLine()!;
-            c.Patients.Add(new Patient(fName, lName));
+            try
+            {
+                Console.Write("Ім'я: ");
+                string fName = Console.ReadLine()!;
+                Console.Write("Прізвище: ");
+                string lName = Console.ReadLine()!;
+                c.Patients.Add(new Patient(fName, lName));
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                Console.WriteLine($"Помилка: {e.Message}");
+            }
+            catch (ArgumentException e)
+            {
+                Console.WriteLine($"Помилка: {e.Message}");
+            }
         }
         else if (choice == "3")
         {
@@ -138,11 +149,32 @@ void DoctorMenu(Clinic c)
         if (choice == "1") c.Doctors.DisplayAll();
         else if (choice == "2")
         {
-            Console.Write("Ім'я: ");
-            string fName = Console.ReadLine()!;
-            Console.Write("Прізвище: ");
-            string lName = Console.ReadLine()!;
-            c.Doctors.Add(new Doctor(fName, lName, Speciality.General));
+            try
+            {
+                Console.Write("Ім'я: ");
+                string fName = Console.ReadLine()!;
+                Console.Write("Прізвище: ");
+                string lName = Console.ReadLine()!;
+                Console.Write("Початок роботи (година 0-23): ");
+                int start = int.Parse(Console.ReadLine()!);
+                Console.Write("Кінець роботи (година 1-24): ");
+                int end = int.Parse(Console.ReadLine()!);
+
+                WorkSchedule schedule = new WorkSchedule(start, end);
+                c.Doctors.Add(new Doctor(fName, lName, Speciality.General, "DOC-000", "0000000000", schedule));
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                Console.WriteLine($"Помилка: {e.Message}");
+            }
+            catch (ArgumentException e)
+            {
+                Console.WriteLine($"Помилка: {e.Message}");
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Помилка: Введено некоректне число.");
+            }
         }
         else if (choice == "3")
         {
@@ -183,17 +215,32 @@ void AppointmentMenu(Clinic c)
         }
         else if (choice == "2")
         {
-            Console.WriteLine("\n--- Список пацієнтів ---");
-            c.Patients.DisplayAll();
-            Console.WriteLine("--- Список лікарів ---");
-            c.Doctors.DisplayAll();
+            try
+            {
+                Console.WriteLine("\n--- Список пацієнтів ---");
+                c.Patients.DisplayAll();
+                Console.WriteLine("--- Список лікарів ---");
+                c.Doctors.DisplayAll();
 
-            Console.Write("Введіть ID пацієнта: ");
-            int pId = int.Parse(Console.ReadLine()!);
-            Console.Write("Введіть ID лікаря: ");
-            int dId = int.Parse(Console.ReadLine()!);
+                Console.Write("Введіть ID пацієнта: ");
+                int pId = int.Parse(Console.ReadLine()!);
+                Console.Write("Введіть ID лікаря: ");
+                int dId = int.Parse(Console.ReadLine()!);
 
-            c.Appointments.Book(pId, dId, DateTime.Now.AddDays(1));
+                c.Appointments.Book(pId, dId, DateTime.Now.AddDays(1));
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                Console.WriteLine($"Помилка: {e.Message}");
+            }
+            catch (ArgumentException e)
+            {
+                Console.WriteLine($"Помилка: {e.Message}");
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Помилка: Введено некоректне число.");
+            }
         }
         else if (choice == "3")
         {

@@ -20,8 +20,7 @@ public class Patient
         get => _firstName;
         set
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Length > 50)
-                throw new ArgumentException("Ім'я не може бути порожнім або довшим за 50 символів.", nameof(FirstName));
+            ClinicValidator.ValidateName(value, nameof(FirstName));
             _firstName = value;
         }
     }
@@ -31,8 +30,7 @@ public class Patient
         get => _lastName;
         set
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Length > 50)
-                throw new ArgumentException("Прізвище не може бути порожнім або довшим за 50 символів.", nameof(LastName));
+            ClinicValidator.ValidateName(value, nameof(LastName));
             _lastName = value;
         }
     }
@@ -42,8 +40,7 @@ public class Patient
         get => _birthDate;
         set
         {
-            if (value > DateTime.Today || value.Year < 1900)
-                throw new ArgumentOutOfRangeException(nameof(BirthDate), "Дата народження не може бути в майбутньому або раніше 1900 року.");
+            ClinicValidator.ValidateDate(value, nameof(BirthDate));
             _birthDate = value;
         }
     }
@@ -53,14 +50,7 @@ public class Patient
         get => _phone;
         set
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Length != 10)
-                throw new ArgumentException("Номер телефону має містити рівно 10 символів.", nameof(Phone));
-
-            for (int i = 0; i < value.Length; i++)
-            {
-                if (!char.IsDigit(value[i]))
-                    throw new ArgumentException("Номер телефону має містити лише цифри.", nameof(Phone));
-            }
+            ClinicValidator.ValidatePhone(value);
             _phone = value;
         }
     }
