@@ -19,17 +19,24 @@ public class Appointment
     public int DurationMinutes
     {
         get => _durationMinutes;
-        set => _durationMinutes = value;
+        set
+        {
+            if (value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(DurationMinutes), "Тривалість має бути більшою за 0.");
+            _durationMinutes = value;
+        }
     }
 
     public Appointment(int patientId, int doctorId, DateTime dateTime)
     {
-        Id = _nextId++;
         PatientId = patientId;
         DoctorId = doctorId;
         DateTime = dateTime;
         Status = AppointmentStatus.Scheduled;
         CancelReason = "";
+        DurationMinutes = 30;
+
+        Id = _nextId++;
     }
 
     public bool Cancel(string reason = "")
