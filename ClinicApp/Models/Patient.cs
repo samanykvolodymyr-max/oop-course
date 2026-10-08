@@ -12,6 +12,7 @@ public class Patient
     private string _lastName = "";
     private DateTime _birthDate;
     private string _phone = "";
+    private string _email = "";
 
     public int Id { get; }
 
@@ -52,6 +53,16 @@ public class Patient
         {
             ClinicValidator.ValidatePhone(value);
             _phone = value;
+        }
+    }
+
+    public string Email
+    {
+        get => _email;
+        set
+        {
+            ClinicValidator.ValidateEmail(value);
+            _email = value;
         }
     }
 
