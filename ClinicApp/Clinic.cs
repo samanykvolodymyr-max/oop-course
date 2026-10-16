@@ -10,6 +10,7 @@ public class Clinic
     public PatientManager Patients { get; }
     public DoctorManager Doctors { get; }
     public AppointmentManager Appointments { get; }
+    public MedicalRecordManager MedicalRecords { get; }
 
     public Clinic(string name)
     {
@@ -17,6 +18,7 @@ public class Clinic
         Patients = new PatientManager();
         Doctors = new DoctorManager();
         Appointments = new AppointmentManager(Patients, Doctors);
+        MedicalRecords = new MedicalRecordManager();
     }
 
     public void DisplaySchedule(DateTime date)
@@ -37,6 +39,7 @@ public class Clinic
         Console.WriteLine($"║  Пацієнтів:          {Patients.Count,-24} ║");
         Console.WriteLine($"║  Лікарів:            {Doctors.Count,-24} ║");
         Console.WriteLine($"║  Майбутніх записів:  {upcoming.Length,-24} ║");
+        Console.WriteLine($"║  Медичних записів:   {MedicalRecords.Count,-24} ║");
         Console.WriteLine("╠══════════════════════════════════════════════╣");
         Console.WriteLine("║  Навантаження лікарів (майбутні записи):     ║");
 
