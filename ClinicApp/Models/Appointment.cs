@@ -5,7 +5,7 @@ using System;
 
 namespace ClinicApp.Models;
 
-public class Appointment : IPayable
+public class Appointment : IPayable, ICancellable
 {
     private static int _nextId = 1;
 
@@ -19,6 +19,9 @@ public class Appointment : IPayable
     public string CancelReason { get; set; }
 
     public bool IsPaid { get; private set; }
+
+    public bool IsCancelled => Status == AppointmentStatus.Cancelled;
+    public string CancellationReason => IsCancelled ? CancelReason : "";
 
     public int DurationMinutes
     {
@@ -50,7 +53,7 @@ public class Appointment : IPayable
 
     public void MarkPaid()
     {
-        if (Status == AppointmentStatus.Cancelled) return;
+        if (IsCancelled) return;
         IsPaid = true;
     }
 
