@@ -33,6 +33,16 @@ public class AppointmentManager
         }
     }
 
+    public Appointment[] GetAll()
+    {
+        Appointment[] result = new Appointment[_count];
+        for (int i = 0; i < _count; i++)
+        {
+            result[i] = _appointments[i];
+        }
+        return result;
+    }
+
     public void Book(int patientId, int doctorId, DateTime dateTime)
     {
         if (_count >= MaxAppointments)
