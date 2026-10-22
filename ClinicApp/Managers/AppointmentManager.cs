@@ -1,4 +1,5 @@
 ﻿using ClinicApp.Enums;
+using ClinicApp.Interfaces;
 using ClinicApp.Models;
 using System;
 
@@ -31,6 +32,50 @@ public class AppointmentManager
             if (index < 0 || index >= _count) return null!;
             return _appointments[index];
         }
+    }
+
+    public static int CancelAll(ICancellable[] items, string reason = "")
+    {
+        if (items == null) return 0;
+        int count = 0;
+        for (int i = 0; i < items.Length; i++)
+        {
+            if (items[i] != null && items[i].Cancel(reason))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public Appointment[] GetAll()
+    {
+        Appointment[] result = new Appointment[_count];
+        for (int i = 0; i < _count; i++)
+        {
+            result[i] = _appointments[i];
+        }
+        return result;
+    }
+
+    public Appointment[] GetByPatient(int patientId)
+    {
+        int matchCount = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i].PatientId == patientId) matchCount++;
+        }
+
+        Appointment[] result = new Appointment[matchCount];
+        int idx = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i].PatientId == patientId)
+            {
+                result[idx++] = _appointments[i];
+            }
+        }
+        return result;
     }
 
     public void Book(int patientId, int doctorId, DateTime dateTime)
