@@ -48,6 +48,36 @@ public class AppointmentManager
         return count;
     }
 
+    private bool AddAppointment(Appointment app)
+    {
+        if (_count >= MaxAppointments)
+        {
+            Console.WriteLine("Досягнуто ліміт записів.");
+            return false;
+        }
+        _appointments[_count++] = app;
+        Console.WriteLine($"Запис [{app.Id}] створено.");
+        return true;
+    }
+
+    public bool Book(int patientId, int doctorId, DateTime dateTime, int durationMinutes = 30)
+    {
+        Appointment app = new RegularAppointment(patientId, doctorId, dateTime, durationMinutes);
+        return AddAppointment(app);
+    }
+
+    public bool BookUrgent(int patientId, int doctorId, DateTime dateTime, string urgencyNote = "", int durationMinutes = 30)
+    {
+        Appointment app = new UrgentAppointment(patientId, doctorId, dateTime, urgencyNote, durationMinutes);
+        return AddAppointment(app);
+    }
+
+    public bool BookSpecialist(int patientId, int doctorId, DateTime dateTime, string topic = "", int durationMinutes = 45)
+    {
+        Appointment app = new SpecialistAppointment(patientId, doctorId, dateTime, topic, durationMinutes);
+        return AddAppointment(app);
+    }
+
     public Appointment[] GetAll()
     {
         Appointment[] result = new Appointment[_count];
@@ -76,19 +106,6 @@ public class AppointmentManager
             }
         }
         return result;
-    }
-
-    public void Book(int patientId, int doctorId, DateTime dateTime)
-    {
-        if (_count >= MaxAppointments)
-        {
-            Console.WriteLine("Досягнуто ліміт записів.");
-            return;
-        }
-
-        Appointment app = new Appointment(patientId, doctorId, dateTime);
-        _appointments[_count++] = app;
-        Console.WriteLine($"Запис [{app.Id}] створено.");
     }
 
     public Appointment? FindById(int id)
@@ -164,7 +181,7 @@ public class AppointmentManager
 
     public void DisplayList(Appointment[] list)
     {
-        if (list.Length == 0)
+        if (list == null || list.Length == 0)
         {
             Console.WriteLine("Записів не знайдено.");
             return;
