@@ -31,9 +31,9 @@ clinic.Doctors.Add(d3);
 clinic.Doctors.Add(d4);
 
 clinic.Appointments.Book(1, 1, DateTime.Now.AddDays(1).AddHours(2));
-clinic.Appointments.Book(2, 2, DateTime.Now.AddDays(1).AddHours(3));
+clinic.Appointments.BookUrgent(2, 2, DateTime.Now.AddDays(1).AddHours(3), "біль у грудях");
+clinic.Appointments.BookSpecialist(3, 4, DateTime.Now.AddDays(1).AddHours(4), "кардіологія", 60);
 
-// Тестові дані під Лабу 06 та 07
 clinic.MedicalRecords.Add(new Diagnosis(1, 1, DateTime.Today.AddDays(-30), "I10", "Гіпертонічна хвороба", isChronic: true));
 clinic.MedicalRecords.Add(new Diagnosis(1, 2, DateTime.Today.AddDays(-5), "J06.9", "Гострий ринофарингіт", isChronic: false));
 clinic.MedicalRecords.Add(new LabResult(1, 1, DateTime.Today.AddDays(-10), "Гемоглобін", 145, "г/л", "120–160", isNormal: true));
@@ -43,6 +43,14 @@ clinic.MedicalRecords.Add(new Prescription(1, 1, DateTime.Today.AddDays(-5), "Л
 clinic.MedicalRecords.Add(new Prescription(2, 2, DateTime.Today.AddDays(-40), "Амоксицилін", "500 мг", 10, "3 рази на добу"));
 clinic.MedicalRecords.Add(new Diagnosis(2, 3, DateTime.Today.AddDays(-15), "L30.9", "Дерматит неуточнений"));
 clinic.MedicalRecords.Add(new LabResult(3, 4, DateTime.Today.AddDays(-1), "Глюкоза", 4.8, "ммоль/л", "3.3–5.5", isNormal: true));
+
+Console.WriteLine("\n== new vs override ==");
+UrgentAppointment urgentObj = new UrgentAppointment(1, 1, DateTime.Now.AddHours(2), "тест");
+Appointment appRef = urgentObj;
+UrgentAppointment urgentRef = urgentObj;
+
+Console.WriteLine($"Через Appointment:       {appRef.GetDescription()} | пріоритет {appRef.GetPriority()}");
+Console.WriteLine($"Через UrgentAppointment: {urgentRef.GetDescription()} | пріоритет {urgentRef.GetPriority()}");
 
 while (true)
 {
@@ -244,6 +252,7 @@ void AppointmentMenu(Clinic c)
         Console.WriteLine("3. Скасувати запис");
         Console.WriteLine("4. Завершити прийом");
         Console.WriteLine("8. Скасувати всі записи пацієнта");
+        Console.WriteLine("9. За типом прийому");
         Console.WriteLine("0. Назад");
         Console.Write("Опція: ");
 
@@ -310,6 +319,24 @@ void AppointmentMenu(Clinic c)
             Appointment[] patientApps = c.Appointments.GetByPatient(pId);
             int cancelledCount = AppointmentManager.CancelAll(patientApps, reason);
             Console.WriteLine($"Скасовано записів: {cancelledCount}");
+        }
+        else if (choice == "9")
+        {
+            Console.WriteLine("1 — термінові, 2 — консультації, 3 — звичайні");
+            Console.Write("Оберіть: ");
+            string typeChoice = Console.ReadLine()!;
+            if (typeChoice == "1")
+            {
+                c.Appointments.DisplayList(c.Appointments.GetUrgent());
+            }
+            else if (typeChoice == "2")
+            {
+                c.Appointments.DisplayList(c.Appointments.GetSpecialist());
+            }
+            else if (typeChoice == "3")
+            {
+                c.Appointments.DisplayList(c.Appointments.GetRegular());
+            }
         }
         else if (choice == "0") break;
     }

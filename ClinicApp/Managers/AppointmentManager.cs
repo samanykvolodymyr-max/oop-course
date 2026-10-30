@@ -48,12 +48,102 @@ public class AppointmentManager
         return count;
     }
 
+    private bool AddAppointment(Appointment app)
+    {
+        if (_count >= MaxAppointments)
+        {
+            Console.WriteLine("Досягнуто ліміт записів.");
+            return false;
+        }
+        _appointments[_count++] = app;
+        Console.WriteLine($"Запис [{app.Id}] створено.");
+        return true;
+    }
+
+    public bool Book(int patientId, int doctorId, DateTime dateTime, int durationMinutes = 30)
+    {
+        Appointment app = new RegularAppointment(patientId, doctorId, dateTime, durationMinutes);
+        return AddAppointment(app);
+    }
+
+    public bool BookUrgent(int patientId, int doctorId, DateTime dateTime, string urgencyNote = "", int durationMinutes = 30)
+    {
+        Appointment app = new UrgentAppointment(patientId, doctorId, dateTime, urgencyNote, durationMinutes);
+        return AddAppointment(app);
+    }
+
+    public bool BookSpecialist(int patientId, int doctorId, DateTime dateTime, string topic = "", int durationMinutes = 45)
+    {
+        Appointment app = new SpecialistAppointment(patientId, doctorId, dateTime, topic, durationMinutes);
+        return AddAppointment(app);
+    }
+
     public Appointment[] GetAll()
     {
         Appointment[] result = new Appointment[_count];
         for (int i = 0; i < _count; i++)
         {
             result[i] = _appointments[i];
+        }
+        return result;
+    }
+
+    public Appointment[] GetUrgent()
+    {
+        int matchCount = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is UrgentAppointment) matchCount++;
+        }
+
+        Appointment[] result = new Appointment[matchCount];
+        int idx = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is UrgentAppointment)
+            {
+                result[idx++] = _appointments[i];
+            }
+        }
+        return result;
+    }
+
+    public Appointment[] GetSpecialist()
+    {
+        int matchCount = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is SpecialistAppointment) matchCount++;
+        }
+
+        Appointment[] result = new Appointment[matchCount];
+        int idx = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is SpecialistAppointment)
+            {
+                result[idx++] = _appointments[i];
+            }
+        }
+        return result;
+    }
+
+    public Appointment[] GetRegular()
+    {
+        int matchCount = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is RegularAppointment) matchCount++;
+        }
+
+        Appointment[] result = new Appointment[matchCount];
+        int idx = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is RegularAppointment)
+            {
+                result[idx++] = _appointments[i];
+            }
         }
         return result;
     }
@@ -76,19 +166,6 @@ public class AppointmentManager
             }
         }
         return result;
-    }
-
-    public void Book(int patientId, int doctorId, DateTime dateTime)
-    {
-        if (_count >= MaxAppointments)
-        {
-            Console.WriteLine("Досягнуто ліміт записів.");
-            return;
-        }
-
-        Appointment app = new Appointment(patientId, doctorId, dateTime);
-        _appointments[_count++] = app;
-        Console.WriteLine($"Запис [{app.Id}] створено.");
     }
 
     public Appointment? FindById(int id)
@@ -162,9 +239,18 @@ public class AppointmentManager
         return app.Complete();
     }
 
+    public void DisplayAppointment(Appointment app)
+    {
+        if (app == null) return;
+        string pName = _patientManager?.FindById(app.PatientId)?.FullName ?? $"Пацієнт #{app.PatientId}";
+        string dName = _doctorManager?.FindById(app.DoctorId)?.FullName ?? $"Лікар #{app.DoctorId}";
+        DateTime endTime = app.DateTime.AddMinutes(app.DurationMinutes);
+        Console.WriteLine($"[{app.Id}] {app.GetDescription()} | {pName} → {dName} | {app.DateTime:dd.MM.yyyy HH:mm}–{endTime:HH:mm} | {app.Status} | {app.GetCost():F2} грн");
+    }
+
     public void DisplayList(Appointment[] list)
     {
-        if (list.Length == 0)
+        if (list == null || list.Length == 0)
         {
             Console.WriteLine("Записів не знайдено.");
             return;
@@ -172,7 +258,7 @@ public class AppointmentManager
 
         for (int i = 0; i < list.Length; i++)
         {
-            Console.WriteLine(list[i].ToString());
+            DisplayAppointment(list[i]);
         }
     }
 }

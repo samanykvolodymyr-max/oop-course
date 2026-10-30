@@ -20,6 +20,8 @@ public class Appointment : IPayable, ICancellable
 
     public bool IsPaid { get; private set; }
 
+    public decimal DiscountMultiplier { get; set; } = 1.0m;
+
     public bool IsCancelled => Status == AppointmentStatus.Cancelled;
     public string CancellationReason => IsCancelled ? CancelReason : "";
 
@@ -46,9 +48,19 @@ public class Appointment : IPayable, ICancellable
         Id = _nextId++;
     }
 
-    public decimal GetCost()
+    public virtual decimal GetCost()
     {
-        return DurationMinutes * 10m;
+        return DurationMinutes * 10m * DiscountMultiplier;
+    }
+
+    public virtual string GetDescription()
+    {
+        return "Прийом";
+    }
+
+    public int GetPriority()
+    {
+        return 3;
     }
 
     public void MarkPaid()
@@ -74,6 +86,6 @@ public class Appointment : IPayable, ICancellable
 
     public override string ToString()
     {
-        return $"[{Id}] Запис P:{PatientId} до D:{DoctorId} на {DateTime:dd.MM.yyyy HH:mm} | Тривалість: {DurationMinutes} хв | Статус: {Status}";
+        return $"[{Id}] {GetDescription()} | P:{PatientId} до D:{DoctorId} на {DateTime:dd.MM.yyyy HH:mm} | Тривалість: {DurationMinutes} хв | Статус: {Status} | {GetCost():F2} грн";
     }
 }
