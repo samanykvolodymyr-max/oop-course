@@ -20,6 +20,8 @@ public class Appointment : IPayable, ICancellable
 
     public bool IsPaid { get; private set; }
 
+    public decimal DiscountMultiplier { get; set; } = 1.0m;
+
     public bool IsCancelled => Status == AppointmentStatus.Cancelled;
     public string CancellationReason => IsCancelled ? CancelReason : "";
 
@@ -48,7 +50,7 @@ public class Appointment : IPayable, ICancellable
 
     public virtual decimal GetCost()
     {
-        return DurationMinutes * 10m;
+        return DurationMinutes * 10m * DiscountMultiplier;
     }
 
     public virtual string GetDescription()
