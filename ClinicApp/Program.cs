@@ -252,6 +252,7 @@ void AppointmentMenu(Clinic c)
         Console.WriteLine("3. Скасувати запис");
         Console.WriteLine("4. Завершити прийом");
         Console.WriteLine("8. Скасувати всі записи пацієнта");
+        Console.WriteLine("9. За типом прийому");
         Console.WriteLine("0. Назад");
         Console.Write("Опція: ");
 
@@ -318,6 +319,24 @@ void AppointmentMenu(Clinic c)
             Appointment[] patientApps = c.Appointments.GetByPatient(pId);
             int cancelledCount = AppointmentManager.CancelAll(patientApps, reason);
             Console.WriteLine($"Скасовано записів: {cancelledCount}");
+        }
+        else if (choice == "9")
+        {
+            Console.WriteLine("1 — термінові, 2 — консультації, 3 — звичайні");
+            Console.Write("Оберіть: ");
+            string typeChoice = Console.ReadLine()!;
+            if (typeChoice == "1")
+            {
+                c.Appointments.DisplayList(c.Appointments.GetUrgent());
+            }
+            else if (typeChoice == "2")
+            {
+                c.Appointments.DisplayList(c.Appointments.GetSpecialist());
+            }
+            else if (typeChoice == "3")
+            {
+                c.Appointments.DisplayList(c.Appointments.GetRegular());
+            }
         }
         else if (choice == "0") break;
     }
