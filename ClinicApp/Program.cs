@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using ClinicApp;
+using ClinicApp.Comparators;
 using ClinicApp.Enums;
 using ClinicApp.Interfaces;
 using ClinicApp.Managers;
@@ -64,6 +66,7 @@ while (true)
     Console.WriteLine("║  5. Рахунки        — оплата, борги           ║");
     Console.WriteLine("║  6. Черга          — очікування, прийом      ║");
     Console.WriteLine("║  7. Звіт           — загальна статистика     ║");
+    Console.WriteLine("║  8. Аналітика      — рейтинги, виручка       ║");
     Console.WriteLine("║  0. Вийти                                    ║");
     Console.WriteLine("╚══════════════════════════════════════════════╝");
     Console.Write("Оберіть розділ: ");
@@ -76,6 +79,7 @@ while (true)
     else if (choice == "5") BillingMenu(clinic);
     else if (choice == "6") WaitingRoomMenu(clinic);
     else if (choice == "7") clinic.GenerateReport();
+    else if (choice == "8") AnalyticsMenu(clinic);
     else if (choice == "0") break;
 }
 
@@ -703,6 +707,74 @@ void WaitingRoomMenu(Clinic c)
                     Console.WriteLine($"{i + 1}. {queueArray[i].FullName} (ID: {queueArray[i].Id})");
                 }
             }
+        }
+        else if (choice == "0") break;
+    }
+}
+
+List<DoctorStats> CollectDoctorStats(Clinic clinic)
+{
+    List<DoctorStats> list = new List<DoctorStats>();
+    foreach (DoctorStats stats in clinic.Analytics.ComputeDoctorStats())
+    {
+        list.Add(stats);
+    }
+    return list;
+}
+
+List<PatientStats> CollectPatientStats(Clinic clinic)
+{
+    List<PatientStats> list = new List<PatientStats>();
+    foreach (PatientStats stats in clinic.Analytics.ComputePatientStats())
+    {
+        list.Add(stats);
+    }
+    return list;
+}
+
+void AnalyticsMenu(Clinic clinic)
+{
+    while (true)
+    {
+        Console.WriteLine("\n── Аналітика ───────────────────");
+        Console.WriteLine("1. Лікарі за навантаженням");
+        Console.WriteLine("2. Лікарі за виручкою");
+        Console.WriteLine("3. Лікарі за іменем");
+        Console.WriteLine("4. Пацієнти за кількістю візитів");
+        Console.WriteLine("5. Пацієнти за витратами");
+        Console.WriteLine("0. Назад");
+        Console.Write("Оберіть: ");
+
+        string choice = Console.ReadLine()!;
+        if (choice == "1")
+        {
+            List<DoctorStats> stats = CollectDoctorStats(clinic);
+            stats.Sort();
+            for (int i = 0; i < stats.Count; i++) Console.WriteLine(stats[i]);
+        }
+        else if (choice == "2")
+        {
+            List<DoctorStats> stats = CollectDoctorStats(clinic);
+            stats.Sort(new DoctorStatsByRevenue());
+            for (int i = 0; i < stats.Count; i++) Console.WriteLine(stats[i]);
+        }
+        else if (choice == "3")
+        {
+            List<DoctorStats> stats = CollectDoctorStats(clinic);
+            stats.Sort(new DoctorStatsByName());
+            for (int i = 0; i < stats.Count; i++) Console.WriteLine(stats[i]);
+        }
+        else if (choice == "4")
+        {
+            List<PatientStats> stats = CollectPatientStats(clinic);
+            stats.Sort();
+            for (int i = 0; i < stats.Count; i++) Console.WriteLine(stats[i]);
+        }
+        else if (choice == "5")
+        {
+            List<PatientStats> stats = CollectPatientStats(clinic);
+            stats.Sort(new PatientStatsBySpent());
+            for (int i = 0; i < stats.Count; i++) Console.WriteLine(stats[i]);
         }
         else if (choice == "0") break;
     }
