@@ -59,16 +59,17 @@ while (true)
     Console.WriteLine("\n╔══════════════════════════════════════════════╗");
     Console.WriteLine("║           МЕДИЧНА КЛІНІКА                    ║");
     Console.WriteLine("╠══════════════════════════════════════════════╣");
-    Console.WriteLine("║  1. Пацієнти        — реєстрація, пошук      ║");
-    Console.WriteLine("║  2. Лікарі          — персонал, розклад      ║");
-    Console.WriteLine("║  3. Записи          — прийоми, скасування    ║");
-    Console.WriteLine("║  4. Медична картка  — діагнози, рецепти      ║");
-    Console.WriteLine("║  5. Рахунки         — оплата, борги          ║");
-    Console.WriteLine("║  6. Черга           — очікування, прийом     ║");
-    Console.WriteLine("║  7. Звіт            — загальна статистика    ║");
-    Console.WriteLine("║  8. Аналітика       — рейтинги, виручка      ║");
-    Console.WriteLine("║  9. Плани лікування — рефлексія, атрибути    ║");
-    Console.WriteLine("║  0. Вийти                                    ║");
+    Console.WriteLine("║  1.  Пацієнти        — реєстрація, пошук     ║");
+    Console.WriteLine("║  2.  Лікарі          — персонал, розклад     ║");
+    Console.WriteLine("║  3.  Записи          — прийоми, скасування   ║");
+    Console.WriteLine("║  4.  Медична картка  — діагнози, рецепти     ║");
+    Console.WriteLine("║  5.  Рахунки         — оплата, борги         ║");
+    Console.WriteLine("║  6.  Черга           — очікування, прийом    ║");
+    Console.WriteLine("║  7.  Звіт            — загальна статистика   ║");
+    Console.WriteLine("║  8.  Аналітика       — рейтинги, виручка     ║");
+    Console.WriteLine("║  9.  Плани лікування — рефлексія, атрибути   ║");
+    Console.WriteLine("║  10. Файли           — лог, звіти, імпорт    ║");
+    Console.WriteLine("║  0.  Вийти                                   ║");
     Console.WriteLine("╚══════════════════════════════════════════════╝");
     Console.Write("Оберіть розділ: ");
 
@@ -82,6 +83,7 @@ while (true)
     else if (choice == "7") clinic.GenerateReport();
     else if (choice == "8") AnalyticsMenu(clinic);
     else if (choice == "9") TreatmentPlansMenu(clinic);
+    else if (choice == "10") FilesMenu(clinic);
     else if (choice == "0") break;
 }
 
@@ -108,15 +110,19 @@ void PatientMenu(Clinic c)
                 string fName = Console.ReadLine()!;
                 Console.Write("Прізвище: ");
                 string lName = Console.ReadLine()!;
-                c.Patients.Add(new Patient(fName, lName));
+                Patient patient = new Patient(fName, lName);
+                c.Patients.Add(patient);
+                c.Logger.LogInfo($"Додано пацієнта #{patient.Id}: {patient.FullName}");
             }
             catch (ArgumentOutOfRangeException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
             catch (ArgumentException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
         }
         else if (choice == "3")
@@ -168,19 +174,24 @@ void DoctorMenu(Clinic c)
                 int end = int.Parse(Console.ReadLine()!);
 
                 WorkSchedule schedule = new WorkSchedule(start, end);
-                c.Doctors.Add(new Doctor(fName, lName, Speciality.General, "DOC-000", "0000000000", schedule));
+                Doctor doctor = new Doctor(fName, lName, Speciality.General, "DOC-000", "0000000000", schedule);
+                c.Doctors.Add(doctor);
+                c.Logger.LogInfo($"Додано лікаря #{doctor.Id}: {doctor.FullName}");
             }
             catch (ArgumentOutOfRangeException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
             catch (ArgumentException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
             catch (FormatException)
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
             }
         }
         else if (choice == "3")
@@ -204,6 +215,7 @@ void DoctorMenu(Clinic c)
             if (!int.TryParse(Console.ReadLine()!, out int dId))
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
                 continue;
             }
 
@@ -218,6 +230,7 @@ void DoctorMenu(Clinic c)
             if (!DateTime.TryParseExact(Console.ReadLine()!, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
             {
                 Console.WriteLine("Помилка: Введено некоректну дату.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректну дату.");
                 continue;
             }
 
@@ -225,6 +238,7 @@ void DoctorMenu(Clinic c)
             if (!int.TryParse(Console.ReadLine()!, out int slotCount))
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
                 continue;
             }
 
@@ -240,10 +254,12 @@ void DoctorMenu(Clinic c)
             catch (ArgumentOutOfRangeException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
             catch (ArgumentException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
         }
         else if (choice == "0") break;
@@ -284,33 +300,53 @@ void AppointmentMenu(Clinic c)
                 int dId = int.Parse(Console.ReadLine()!);
 
                 c.Appointments.Book(pId, dId, DateTime.Now.AddDays(1));
+                c.Logger.LogInfo($"Запис створено: пацієнт #{pId} → лікар #{dId}");
             }
             catch (ArgumentOutOfRangeException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
             catch (ArgumentException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
             catch (FormatException)
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
             }
         }
         else if (choice == "3")
         {
             Console.Write("ID запису для скасування: ");
-            int id = int.Parse(Console.ReadLine()!);
-            Console.Write("Причина: ");
-            string reason = Console.ReadLine()!;
-            c.Appointments.Cancel(id, reason);
+            if (int.TryParse(Console.ReadLine()!, out int id))
+            {
+                Console.Write("Причина: ");
+                string reason = Console.ReadLine()!;
+                c.Appointments.Cancel(id, reason);
+                c.Logger.LogInfo($"Запис #{id} скасовано ({reason})");
+            }
+            else
+            {
+                Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
+            }
         }
         else if (choice == "4")
         {
             Console.Write("ID запису для завершення: ");
-            int id = int.Parse(Console.ReadLine()!);
-            c.Appointments.Complete(id);
+            if (int.TryParse(Console.ReadLine()!, out int id))
+            {
+                c.Appointments.Complete(id);
+                c.Logger.LogInfo($"Запис #{id} завершено");
+            }
+            else
+            {
+                Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
+            }
         }
         else if (choice == "8")
         {
@@ -318,6 +354,7 @@ void AppointmentMenu(Clinic c)
             if (!int.TryParse(Console.ReadLine()!, out int pId))
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
                 continue;
             }
 
@@ -327,6 +364,7 @@ void AppointmentMenu(Clinic c)
             Appointment[] patientApps = c.Appointments.GetByPatient(pId);
             int cancelledCount = AppointmentManager.CancelAll(patientApps, reason);
             Console.WriteLine($"Скасовано записів: {cancelledCount}");
+            c.Logger.LogInfo($"Скасовано {cancelledCount} записів пацієнта #{pId}");
         }
         else if (choice == "9")
         {
@@ -375,6 +413,7 @@ void MedicalRecordMenu(Clinic c)
             else
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
             }
         }
         else if (choice == "2")
@@ -395,6 +434,7 @@ void MedicalRecordMenu(Clinic c)
             else
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
             }
         }
         else if (choice == "3")
@@ -408,6 +448,7 @@ void MedicalRecordMenu(Clinic c)
             if (!int.TryParse(Console.ReadLine()!, out int pId))
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
                 continue;
             }
 
@@ -415,6 +456,7 @@ void MedicalRecordMenu(Clinic c)
             if (!int.TryParse(Console.ReadLine()!, out int dId))
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
                 continue;
             }
 
@@ -439,10 +481,12 @@ void MedicalRecordMenu(Clinic c)
             catch (ArgumentOutOfRangeException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
             catch (ArgumentException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
         }
         else if (choice == "4")
@@ -456,6 +500,7 @@ void MedicalRecordMenu(Clinic c)
             if (!int.TryParse(Console.ReadLine()!, out int pId))
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
                 continue;
             }
 
@@ -463,6 +508,7 @@ void MedicalRecordMenu(Clinic c)
             if (!int.TryParse(Console.ReadLine()!, out int dId))
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
                 continue;
             }
 
@@ -478,6 +524,7 @@ void MedicalRecordMenu(Clinic c)
             if (!double.TryParse(Console.ReadLine()!, NumberStyles.Float, CultureInfo.InvariantCulture, out double val))
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
                 continue;
             }
 
@@ -496,10 +543,12 @@ void MedicalRecordMenu(Clinic c)
             catch (ArgumentOutOfRangeException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
             catch (ArgumentException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
         }
         else if (choice == "5")
@@ -513,6 +562,7 @@ void MedicalRecordMenu(Clinic c)
             if (!int.TryParse(Console.ReadLine()!, out int pId))
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
                 continue;
             }
 
@@ -520,6 +570,7 @@ void MedicalRecordMenu(Clinic c)
             if (!int.TryParse(Console.ReadLine()!, out int dId))
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
                 continue;
             }
 
@@ -537,6 +588,7 @@ void MedicalRecordMenu(Clinic c)
             if (!int.TryParse(Console.ReadLine()!, out int days))
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
                 continue;
             }
 
@@ -550,10 +602,12 @@ void MedicalRecordMenu(Clinic c)
             catch (ArgumentOutOfRangeException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
             catch (ArgumentException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
         }
         else if (choice == "6")
@@ -567,6 +621,7 @@ void MedicalRecordMenu(Clinic c)
             else
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
             }
         }
         else if (choice == "0") break;
@@ -602,6 +657,7 @@ void BillingMenu(Clinic c)
             else
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
             }
         }
         else if (choice == "2")
@@ -617,6 +673,7 @@ void BillingMenu(Clinic c)
                 if (c.Billing.PayAppointment(id))
                 {
                     Console.WriteLine($"Запис [{id}] оплачено.");
+                    c.Logger.LogInfo($"Запис #{id} оплачено");
                 }
                 else
                 {
@@ -626,6 +683,7 @@ void BillingMenu(Clinic c)
             else
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
             }
         }
         else if (choice == "4")
@@ -668,6 +726,7 @@ void WaitingRoomMenu(Clinic c)
             else
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
             }
         }
         else if (choice == "2")
@@ -680,6 +739,7 @@ void WaitingRoomMenu(Clinic c)
             catch (InvalidOperationException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
         }
         else if (choice == "3")
@@ -692,6 +752,7 @@ void WaitingRoomMenu(Clinic c)
             catch (InvalidOperationException e)
             {
                 Console.WriteLine($"Помилка: {e.Message}");
+                c.Logger.LogWarning($"Помилка введення: {e.Message}");
             }
         }
         else if (choice == "4")
@@ -819,6 +880,7 @@ void TreatmentPlansMenu(Clinic c)
             if (c.TreatmentPlans.Add(plan))
             {
                 Console.WriteLine("План лікування додано.");
+                c.Logger.LogInfo($"Додано план лікування #{plan.Id} для пацієнта #{plan.PatientId}");
             }
         }
         else if (choice == "3")
@@ -842,6 +904,7 @@ void TreatmentPlansMenu(Clinic c)
             else
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
             }
         }
         else if (choice == "4")
@@ -866,6 +929,7 @@ void TreatmentPlansMenu(Clinic c)
             else
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
             }
         }
         else if (choice == "5")
@@ -890,6 +954,7 @@ void TreatmentPlansMenu(Clinic c)
             else
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
             }
         }
         else if (choice == "6")
@@ -914,11 +979,56 @@ void TreatmentPlansMenu(Clinic c)
             else
             {
                 Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
             }
         }
         else if (choice == "7")
         {
             ModelValidator.PrintInfo(typeof(TreatmentPlan));
+        }
+        else if (choice == "0") break;
+    }
+}
+
+void FilesMenu(Clinic c)
+{
+    while (true)
+    {
+        Console.WriteLine("\n── Файли ───────────────────────────────");
+        Console.WriteLine("1. Останні рядки лога");
+        Console.WriteLine("2. Очистити лог");
+        Console.WriteLine("0. Назад");
+        Console.Write("Оберіть: ");
+
+        string choice = Console.ReadLine()!;
+        if (choice == "1")
+        {
+            Console.Write("Скільки рядків показати: ");
+            if (int.TryParse(Console.ReadLine()!, out int n))
+            {
+                string[] lines = c.Logger.GetLastLines(n);
+                if (lines.Length == 0)
+                {
+                    Console.WriteLine("Лог порожній або файл не знайдено.");
+                }
+                else
+                {
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        Console.WriteLine(lines[i]);
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Помилка: Введено некоректне число.");
+                c.Logger.LogWarning("Помилка введення: Введено некоректне число.");
+            }
+        }
+        else if (choice == "2")
+        {
+            c.Logger.Clear();
+            Console.WriteLine("Лог очищено.");
         }
         else if (choice == "0") break;
     }
