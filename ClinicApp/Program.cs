@@ -54,6 +54,18 @@ UrgentAppointment urgentRef = urgentObj;
 Console.WriteLine($"Через Appointment:       {appRef.GetDescription()} | пріоритет {appRef.GetPriority()}");
 Console.WriteLine($"Через UrgentAppointment: {urgentRef.GetDescription()} | пріоритет {urgentRef.GetPriority()}");
 
+if (clinic.Session.Exists())
+{
+    Console.Write("\nЗнайдено збережену сесію. Завантажити? (y/n): ");
+    string answer = Console.ReadLine() ?? "";
+    if (answer.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
+    {
+        int loaded = clinic.Session.Load(clinic);
+        Console.WriteLine($"Завантажено {loaded} пацієнтів.");
+        clinic.Logger.LogInfo($"Завантажено сесію: {loaded} пацієнтів");
+    }
+}
+
 while (true)
 {
     Console.WriteLine("\n╔══════════════════════════════════════════════╗");
@@ -84,7 +96,18 @@ while (true)
     else if (choice == "8") AnalyticsMenu(clinic);
     else if (choice == "9") TreatmentPlansMenu(clinic);
     else if (choice == "10") FilesMenu(clinic);
-    else if (choice == "0") break;
+    else if (choice == "0")
+    {
+        Console.Write("Зберегти сесію? (y/n): ");
+        string saveAnswer = Console.ReadLine() ?? "";
+        if (saveAnswer.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
+        {
+            clinic.Session.Save(clinic);
+            Console.WriteLine("Сесію збережено.");
+            clinic.Logger.LogInfo("Сесію збережено");
+        }
+        break;
+    }
 }
 
 void PatientMenu(Clinic c)
