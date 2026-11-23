@@ -997,6 +997,7 @@ void FilesMenu(Clinic c)
         Console.WriteLine("\n── Файли ───────────────────────────────");
         Console.WriteLine("1. Останні рядки лога");
         Console.WriteLine("2. Очистити лог");
+        Console.WriteLine("3. Експортувати всі звіти");
         Console.WriteLine("0. Назад");
         Console.Write("Оберіть: ");
 
@@ -1029,6 +1030,16 @@ void FilesMenu(Clinic c)
         {
             c.Logger.Clear();
             Console.WriteLine("Лог очищено.");
+        }
+        else if (choice == "3")
+        {
+            string[] paths = c.Exporter.ExportAll();
+            Console.WriteLine("Створено файли звітів:");
+            for (int i = 0; i < paths.Length; i++)
+            {
+                Console.WriteLine($"  {paths[i]}");
+            }
+            c.Logger.LogInfo($"Експортовано {paths.Length} звітів");
         }
         else if (choice == "0") break;
     }
