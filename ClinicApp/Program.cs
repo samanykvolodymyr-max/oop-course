@@ -100,6 +100,9 @@ while (true)
     else if (choice == "10") FilesMenu(clinic);
     else if (choice == "0")
     {
+        clinic.Tracker.PrintSummary();
+        clinic.Tracker.SaveSummary();
+
         Console.Write("Зберегти сесію? (y/n): ");
         string saveAnswer = Console.ReadLine() ?? "";
         if (saveAnswer.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
