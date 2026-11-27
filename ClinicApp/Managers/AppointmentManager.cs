@@ -1,4 +1,5 @@
 ﻿using ClinicApp.Enums;
+using ClinicApp.Events;
 using ClinicApp.Interfaces;
 using ClinicApp.Models;
 using System;
@@ -12,6 +13,8 @@ public class AppointmentManager
     private int _count = 0;
     private PatientManager? _patientManager;
     private DoctorManager? _doctorManager;
+
+    public event EventHandler<AppointmentEventArgs>? AppointmentBooked;
 
     public int Count => _count;
 
@@ -48,7 +51,7 @@ public class AppointmentManager
         return count;
     }
 
-    private bool AddAppointment(Appointment app)
+    private bool AddAppointment(Appointment app, string notes = "")
     {
         if (_count >= MaxAppointments)
         {
@@ -57,6 +60,7 @@ public class AppointmentManager
         }
         _appointments[_count++] = app;
         Console.WriteLine($"Запис [{app.Id}] створено.");
+        AppointmentBooked?.Invoke(this, new AppointmentEventArgs(app.Id, app.PatientId, app.DoctorId, app.DateTime, notes));
         return true;
     }
 
@@ -69,13 +73,13 @@ public class AppointmentManager
     public bool BookUrgent(int patientId, int doctorId, DateTime dateTime, string urgencyNote = "", int durationMinutes = 30)
     {
         Appointment app = new UrgentAppointment(patientId, doctorId, dateTime, urgencyNote, durationMinutes);
-        return AddAppointment(app);
+        return AddAppointment(app, urgencyNote);
     }
 
     public bool BookSpecialist(int patientId, int doctorId, DateTime dateTime, string topic = "", int durationMinutes = 45)
     {
         Appointment app = new SpecialistAppointment(patientId, doctorId, dateTime, topic, durationMinutes);
-        return AddAppointment(app);
+        return AddAppointment(app, topic);
     }
 
     public Appointment[] GetAll()
