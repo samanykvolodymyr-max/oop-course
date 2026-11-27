@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClinicApp.Events;
+using System;
 using System.IO;
 using System.Text;
 
@@ -34,6 +35,34 @@ public class ClinicLogger
     {
         WriteLog("ERROR", message);
     }
+
+    public void OnPatientAdded(object? sender, PatientEventArgs e)
+        => LogInfo($"Новий пацієнт #{e.PatientId}: {e.FullName}");
+
+    public void OnAppointmentBooked(object? sender, AppointmentEventArgs e)
+        => LogInfo($"Запис #{e.AppointmentId} створено: пацієнт #{e.PatientId} → лікар #{e.DoctorId}");
+
+    public void OnUrgentAppointmentBooked(object? sender, AppointmentEventArgs e)
+    {
+        string msg = $"ТЕРМІНОВИЙ запис #{e.AppointmentId}: {e.Notes}";
+        LogWarning(msg);
+        Directory.CreateDirectory("alerts");
+        string alertFile = Path.Combine("alerts", $"urgent_{DateTime.Now:yyyy-MM-dd}.txt");
+        string alertLine = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {msg}{Environment.NewLine}";
+        File.AppendAllText(alertFile, alertLine, Encoding.UTF8);
+    }
+
+    public void OnAppointmentCancelled(object? sender, AppointmentEventArgs e)
+        => LogInfo($"Запис #{e.AppointmentId} скасовано" + (string.IsNullOrWhiteSpace(e.Notes) ? "" : $" ({e.Notes})"));
+
+    public void OnAppointmentCompleted(object? sender, AppointmentEventArgs e)
+        => LogInfo($"Запис #{e.AppointmentId} завершено");
+
+    public void OnPaymentReceived(object? sender, PaymentEventArgs e)
+        => LogInfo($"Оплата запису #{e.AppointmentId}: {e.Amount:F2} грн");
+
+    public void OnPlanCompleted(object? sender, TreatmentPlanEventArgs e)
+        => LogInfo($"План лікування #{e.PlanId} (пацієнт #{e.PatientId}, {e.Diagnosis}) завершено");
 
     public string[] GetLastLines(int n)
     {

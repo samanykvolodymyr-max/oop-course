@@ -137,7 +137,6 @@ void PatientMenu(Clinic c)
                 string lName = Console.ReadLine()!;
                 Patient patient = new Patient(fName, lName);
                 c.Patients.Add(patient);
-                c.Logger.LogInfo($"Додано пацієнта #{patient.Id}: {patient.FullName}");
             }
             catch (ArgumentOutOfRangeException e)
             {
@@ -325,7 +324,6 @@ void AppointmentMenu(Clinic c)
                 int dId = int.Parse(Console.ReadLine()!);
 
                 c.Appointments.Book(pId, dId, DateTime.Now.AddDays(1));
-                c.Logger.LogInfo($"Запис створено: пацієнт #{pId} → лікар #{dId}");
             }
             catch (ArgumentOutOfRangeException e)
             {
@@ -351,7 +349,6 @@ void AppointmentMenu(Clinic c)
                 Console.Write("Причина: ");
                 string reason = Console.ReadLine()!;
                 c.Appointments.Cancel(id, reason);
-                c.Logger.LogInfo($"Запис #{id} скасовано ({reason})");
             }
             else
             {
@@ -365,7 +362,6 @@ void AppointmentMenu(Clinic c)
             if (int.TryParse(Console.ReadLine()!, out int id))
             {
                 c.Appointments.Complete(id);
-                c.Logger.LogInfo($"Запис #{id} завершено");
             }
             else
             {
@@ -386,10 +382,8 @@ void AppointmentMenu(Clinic c)
             Console.Write("Причина (Enter — без причини): ");
             string reason = Console.ReadLine()!;
 
-            Appointment[] patientApps = c.Appointments.GetByPatient(pId);
-            int cancelledCount = AppointmentManager.CancelAll(patientApps, reason);
+            int cancelledCount = c.Appointments.CancelAllByPatient(pId, reason);
             Console.WriteLine($"Скасовано записів: {cancelledCount}");
-            c.Logger.LogInfo($"Скасовано {cancelledCount} записів пацієнта #{pId}");
         }
         else if (choice == "9")
         {
@@ -698,7 +692,6 @@ void BillingMenu(Clinic c)
                 if (c.Billing.PayAppointment(id))
                 {
                     Console.WriteLine($"Запис [{id}] оплачено.");
-                    c.Logger.LogInfo($"Запис #{id} оплачено");
                 }
                 else
                 {
@@ -962,18 +955,13 @@ void TreatmentPlansMenu(Clinic c)
             Console.Write("ID плану: ");
             if (int.TryParse(Console.ReadLine()!, out int id))
             {
-                TreatmentPlan? plan = c.TreatmentPlans.GetById(id);
-                if (plan == null)
-                {
-                    Console.WriteLine("План не знайдено.");
-                }
-                else if (plan.Complete())
+                if (c.TreatmentPlans.Complete(id))
                 {
                     Console.WriteLine("План завершено.");
                 }
                 else
                 {
-                    Console.WriteLine($"Неможливо завершити план (поточний статус: {plan.Status}).");
+                    Console.WriteLine("Не вдалося завершити план (не знайдено або вже не активний).");
                 }
             }
             else
