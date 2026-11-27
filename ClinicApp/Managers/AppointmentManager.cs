@@ -1,4 +1,5 @@
 ﻿using ClinicApp.Enums;
+using ClinicApp.Events;
 using ClinicApp.Interfaces;
 using ClinicApp.Models;
 using System;
@@ -12,6 +13,11 @@ public class AppointmentManager
     private int _count = 0;
     private PatientManager? _patientManager;
     private DoctorManager? _doctorManager;
+
+    public event EventHandler<AppointmentEventArgs>? AppointmentBooked;
+    public event EventHandler<AppointmentEventArgs>? UrgentAppointmentBooked;
+    public event EventHandler<AppointmentEventArgs>? AppointmentCancelled;
+    public event EventHandler<AppointmentEventArgs>? AppointmentCompleted;
 
     public int Count => _count;
 
@@ -48,7 +54,21 @@ public class AppointmentManager
         return count;
     }
 
-    private bool AddAppointment(Appointment app)
+    public int CancelAllByPatient(int patientId, string reason = "")
+    {
+        int count = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i].PatientId == patientId && _appointments[i].Cancel(reason))
+            {
+                count++;
+                AppointmentCancelled?.Invoke(this, new AppointmentEventArgs(_appointments[i].Id, _appointments[i].PatientId, _appointments[i].DoctorId, _appointments[i].DateTime, reason));
+            }
+        }
+        return count;
+    }
+
+    private bool AddAppointment(Appointment app, string notes = "")
     {
         if (_count >= MaxAppointments)
         {
@@ -57,6 +77,7 @@ public class AppointmentManager
         }
         _appointments[_count++] = app;
         Console.WriteLine($"Запис [{app.Id}] створено.");
+        AppointmentBooked?.Invoke(this, new AppointmentEventArgs(app.Id, app.PatientId, app.DoctorId, app.DateTime, notes));
         return true;
     }
 
@@ -69,13 +90,18 @@ public class AppointmentManager
     public bool BookUrgent(int patientId, int doctorId, DateTime dateTime, string urgencyNote = "", int durationMinutes = 30)
     {
         Appointment app = new UrgentAppointment(patientId, doctorId, dateTime, urgencyNote, durationMinutes);
-        return AddAppointment(app);
+        if (AddAppointment(app, urgencyNote))
+        {
+            UrgentAppointmentBooked?.Invoke(this, new AppointmentEventArgs(app.Id, app.PatientId, app.DoctorId, app.DateTime, urgencyNote));
+            return true;
+        }
+        return false;
     }
 
     public bool BookSpecialist(int patientId, int doctorId, DateTime dateTime, string topic = "", int durationMinutes = 45)
     {
         Appointment app = new SpecialistAppointment(patientId, doctorId, dateTime, topic, durationMinutes);
-        return AddAppointment(app);
+        return AddAppointment(app, topic);
     }
 
     public Appointment[] GetAll()
@@ -229,14 +255,24 @@ public class AppointmentManager
     {
         Appointment? app = FindById(id);
         if (app == null) return false;
-        return app.Cancel(reason);
+        if (app.Cancel(reason))
+        {
+            AppointmentCancelled?.Invoke(this, new AppointmentEventArgs(app.Id, app.PatientId, app.DoctorId, app.DateTime, reason));
+            return true;
+        }
+        return false;
     }
 
     public bool Complete(int id)
     {
         Appointment? app = FindById(id);
         if (app == null) return false;
-        return app.Complete();
+        if (app.Complete())
+        {
+            AppointmentCompleted?.Invoke(this, new AppointmentEventArgs(app.Id, app.PatientId, app.DoctorId, app.DateTime));
+            return true;
+        }
+        return false;
     }
 
     public void DisplayAppointment(Appointment app)
